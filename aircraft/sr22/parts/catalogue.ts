@@ -1,0 +1,104 @@
+/**
+ * SR22 catalogue: `CAT` with its label lists, and the helpers the section files share: the `part` / `shell` /
+ * `surface` / `onSurf` wrappers and the per-frame part animations (no parts). The parts register in the section files;
+ * `index.ts` imports them in order.
+ */
+import * as THREE from "three";
+import { Catalogue, chanOfKey, type PartAnim } from "@/lib/catalogue";
+import { mats } from "@/lib/materials";
+import { useView } from "@/lib/view";
+import { clamp, type Vec3 } from "@/lib/math";
+import { magFires, sysNow } from "@/lib/anims";
+import { AB, paintSkin, wingP } from "../geometry";
+import { altAirOpen, live } from "../model";
+import { useSR22 } from "../store";
+
+import { ENGINE_GROUPS, engineHidden } from "../engine-groups";
+import { useEngineGroups } from "../engine-group-store";
+
+export { chanOfKey };
+
+// The ADAHRS, GIAs and the three avionics fans sit behind the displays and the standby instrument, and the bezels frame
+// them: listed under "tap to locate" but not labelled, so their pins don't cover the screens (which carry their own labels on the top bezel edge, Airplane.tsx SCREENS).
+// MAG 2 is quiet too: it sits beside MAG 1, so its pin would cover MAG 1's.
+export const CAT = new Catalogue(
+  "sr22",
+  {
+    priority: {
+      pitot: ["Stall warning computer", "Stall warning pressure switch"],
+      // The inboard sensor's left-root label wins over the strainer's; the selector stays clear.
+      fuel: ["Fuel selector valve", "Fuel quantity sensor (inboard)"],
+    },
+    quiet: {
+      avionics: [
+        "GSU 75 ADAHRS 1",
+        "GSU 75 ADAHRS 2",
+        "GIA 1 (GIA 63W)",
+        "GIA 2 (GIA 63W)",
+        "PFD cooling fan",
+        "MFD cooling fan",
+        "Avionics (IAU) cooling fan",
+        "Magnetometer (GMU 44, MAG 2)",
+        "PFD bezel",
+        "MFD bezel",
+      ],
+    },
+  },
+  paintSkin,
+  // Walkaround targets must stay mounted even when their engine study group is hidden.
+  (spec) => !useView.getState().walking && engineHidden(spec, sysNow(), useEngineGroups.getState().shown),
+  ENGINE_GROUPS,
+);
+CAT.trackVisibility(useView, (v) => `${v.sys}:${v.walking}`);
+CAT.trackVisibility(useEngineGroups, (s) => s.shown);
+CAT.trackVisibility(useSR22, (s) => `${s.s.equip.fiki}:${s.s.equip.oxygen !== false}`);
+export const { part, surfacePivot, shell, loftSurface: surface, onSurface: onSurf } = CAT;
+
+/* ---------- per-frame part animations ---------- */
+export const fires = (mag: "R" | "L") => () => live.rpm > 100 && magFires(mag, useSR22.getState().s.eng.key);
+export const altAnim =
+  (which: "alt1" | "alt2"): PartAnim =>
+  (m) => {
+    const up = useSR22.getState().E[which],
+      sys = sysNow();
+    const show = sys === "overview" || sys === "electrical" || sys === "engine";
+    m.material = !show ? mats("#D9960F").dim : up ? mats("#D9960F").hi : mats("#5A5040").on;
+  };
+export const selPtrAnim: PartAnim = (m) => {
+  const sel = useSR22.getState().s.fuel.sel;
+  m.rotation.y = sel === "L" ? Math.PI / 2 : sel === "R" ? -Math.PI / 2 : Math.PI;
+};
+export const altDoorAnim =
+  (x0: number): PartAnim =>
+  (m) => {
+    m.position.x = x0 - (altAirOpen(useSR22.getState().s) ? 0.05 : 0);
+  };
+/** Stall warning inlet span station (pitot.ts); here so `suctionAnim` doesn't import a later section. */
+export const STALL_Z = 3.0;
+export const suctionAnim: PartAnim = (m) => {
+  const aoa = useSR22.getState().s.stall.aoa,
+    xc = clamp(0.32 - (aoa / 14) * 0.32, 0, 0.32);
+  m.position.copy(wingP(STALL_Z, xc, aoa >= 14 ? 0 : 1));
+  m.visible = sysNow() === "pitot";
+};
+
+/* ---------- section helpers ---------- */
+/** Left-wing sections reversed, so a mirrored loft keeps its faces outward. */
+export const sided = (secs: THREE.Vector3[][], s: number) => (s < 0 ? secs.map((r) => r.reverse()) : secs);
+
+/** Console lever pivot, schematic: POH 13772-006 Fig 7-4 (7-14), 7-32. */
+export const CONSOLE_QUADRANT: Vec3 = [1.72, -0.32, 0];
+/** MD302 standby screen centre (Airplane.tsx SCREENS). */
+export const MD302_POS: Vec3 = [2.175, -0.07, -0.245];
+/** Separate rear pressure connections in the modeled housing behind the standby display.
+ * Display position is unchanged. Connector offsets are schematic, not installation dimensions. */
+export const MD302_PITOT_PORT: Vec3 = [MD302_POS[0] + 0.105, MD302_POS[1], MD302_POS[2] - 0.025];
+export const MD302_STATIC_PORT: Vec3 = [MD302_POS[0] + 0.105, MD302_POS[1], MD302_POS[2] + 0.025];
+
+/** Key switch on the instrument panel (POH 7-37; AMM Fig 74-30-2 PDF p. 2633); position illustrative. */
+export const IGNITION_SWITCH: Vec3 = [2.266, 0.03, -0.47];
+
+/** Illustrative ELT remote-cable passage through FS 222. POH 13772-006 7-90, Fig 7-21 (7-91);
+ * AMM 13773-002 Rev 7 Fig 25-60-1 item 2 (PDF 912–913) does not dimension the floor route or penetration. */
+export const ELT_BULKHEAD_PASS: Vec3 = [AB, -0.45, 0.05];
+export const ELT_PASS_RADIUS = 0.006;

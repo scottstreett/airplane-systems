@@ -6,6 +6,7 @@ import type { AircraftId } from "./systems";
  */
 export const FLEET_INDEX: { id: AircraftId; name: string; sub: string; walk: boolean }[] = [
   { id: "sr20", name: "SR20 G6", sub: "Perspective+ · GFC 700 · IO-390", walk: true },
+  { id: "sr22", name: "SR22 G6", sub: "Perspective+ · GFC 700 · IO-550-N", walk: true },
   { id: "sr22t", name: "SR22T G6", sub: "Perspective+ · GFC 700 · TSIO-550-K", walk: true },
   { id: "c172s", name: "C172S Skyhawk", sub: "NAV III G1000 · GFC 700 · IO-360", walk: true },
   { id: "c182t", name: "C182T Skylane", sub: "NAV III G1000 · KAP 140 · IO-540", walk: true },

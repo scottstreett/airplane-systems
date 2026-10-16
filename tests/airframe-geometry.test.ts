@@ -76,13 +76,13 @@ describe.each(FLEET)("$id exterior geometry", (def) => {
         g.dispose();
       }
     },
-    def.id === "sr22t" ? 60000 : 30000,
+    def.id === "sr22t" || def.id === "sr22" ? 60000 : 30000,
   );
   it("keeps the aircraft's paint on its fin and hinged rudder", () => {
     const fin = shells.find((s) => s.name === "Vertical stabilizer" || s.name === "Vertical fin")!;
     const rudder = def.labels!.cat.surfaces.find((s) => s.key === "rudder")!;
-    // The SR22T has no photo-traced livery (no LIVERY_REGISTRATION entry): neither surface is painted.
-    if (def.id === "sr22t") {
+    // The SR22 and SR22T have no photo-traced livery (no LIVERY_REGISTRATION entry): neither surface is painted.
+    if (def.id === "sr22t" || def.id === "sr22") {
       expect(fin.skin).toBeUndefined();
       expect(rudder.skin).toBeUndefined();
       return;
