@@ -20,7 +20,7 @@ it("serves every known development view from the app page", async () => {
 
 it("preserves unknown single system segments while leaving unrelated paths alone in development", async () => {
   const config = nextConfig(PHASE_DEVELOPMENT_SERVER);
-  for (const path of ["/sr22t/bogus", "/sr22t/electrical?fiki=0"]) {
+  for (const path of ["/sr22/bogus", "/sr22/electrical?fiki=0"]) {
     const response = await unstable_getResponseFromNextConfig({
       url: `https://example.com${path}`,
       nextConfig: config,
@@ -28,7 +28,7 @@ it("preserves unknown single system segments while leaving unrelated paths alone
     expect(new URL(getRewrittenUrl(response)!).pathname).toBe("/");
     if (path.includes("?")) expect(new URL(getRewrittenUrl(response)!).search).toBe("?fiki=0");
   }
-  for (const path of ["/nope", "/electrical", "/sr22t/electrical/extra", "/_next/static/chunks/app.js"]) {
+  for (const path of ["/nope", "/electrical", "/sr22/electrical/extra", "/_next/static/chunks/app.js"]) {
     const response = await unstable_getResponseFromNextConfig({
       url: `https://example.com${path}`,
       nextConfig: config,
@@ -46,7 +46,7 @@ it("keeps the server view rule in a default production build", async () => {
   const config = nextConfig(PHASE_PRODUCTION_BUILD);
   expect(config.output).toBeUndefined();
   const response = await unstable_getResponseFromNextConfig({
-    url: "https://example.com/sr22t/electrical",
+    url: "https://example.com/sr22/electrical",
     nextConfig: config,
   });
   expect(getRewrittenUrl(response)).toBe("https://example.com/");

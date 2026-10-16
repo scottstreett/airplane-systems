@@ -92,7 +92,7 @@ let camId = 0;
 let focusTimer: ReturnType<typeof setTimeout> | undefined;
 
 export const useView = create<ViewStore>((set) => ({
-  ac: "sr20",
+  ac: "sr22",
   sys: "overview",
   xray: true,
   labels: true,

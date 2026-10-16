@@ -33,12 +33,7 @@ const STEPS: Step[] = [
     sel: ".fleet",
     place: "right",
     title: "Pick an airplane",
-    body: (
-      <>
-        Switch between the SR20, SR22, SR22T, 172S, 182T, DA40 and M20C. Each airplane keeps its own switch positions
-        while you look at another. Try one now.
-      </>
-    ),
+    body: <>This site models the SR22; the picker also opens the standalone engine and component simulations.</>,
   },
   {
     sel: ".syslist",
@@ -126,14 +121,7 @@ export function Tour() {
     card = useRef<HTMLDivElement>(null),
     next = useRef<HTMLButtonElement>(null);
 
-  // first visit: show the tour unless it was skipped or finished before
-  useEffect(() => {
-    let done: string | null = null;
-    try {
-      done = localStorage.getItem(DONE_KEY);
-    } catch {}
-    if (done !== "1") startTour();
-  }, []);
+  // This deployment does not start the tour on a first visit; the toolbar's ? button replays it on request.
 
   const s = step === null ? null : STEPS[step];
 

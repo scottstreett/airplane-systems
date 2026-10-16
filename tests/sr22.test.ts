@@ -37,11 +37,11 @@ const sim = (patch: (d: Sim) => void = () => {}): Sim => {
 const names = (m: [string, string][]) => m.map(([, n]) => n);
 
 describe("SR22 definition", () => {
-  it("is the normally aspirated IO-550-N in the fleet picker, between the SR20 and the SR22T", () => {
+  it("is the normally aspirated IO-550-N and the only airplane this deployment serves", () => {
     expect(SR22.id).toBe("sr22");
     expect(SR22.name).toBe("SR22 G6");
     expect(SR22.sub).toContain("IO-550-N");
-    expect(FLEET_INDEX.map((f) => f.id).slice(0, 3)).toEqual(["sr20", "sr22", "sr22t"]);
+    expect(FLEET_INDEX.map((f) => f.id)).toEqual(["sr22"]);
     const entry = FLEET_INDEX.find((f) => f.id === "sr22")!;
     expect(entry).toMatchObject({ name: SR22.name, sub: SR22.sub, walk: true });
   });

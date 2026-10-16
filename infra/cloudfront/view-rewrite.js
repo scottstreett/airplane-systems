@@ -2,7 +2,7 @@
 // AIRCRAFT_IDS is copied from lib/systems.ts, ENGINE_IDS from engines/index.ts and COMPONENT_IDS from
 // engines/components/index.ts; the offline test prevents drift.
 // Event/query format: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/functions-event-structure.html
-var AIRCRAFT_IDS = ["sr20", "sr22", "sr22t", "c172s", "c182t", "da40", "m20c"];
+var AIRCRAFT_IDS = ["sr22"];
 var ENGINE_IDS = ["io390", "o360"];
 var COMPONENT_IDS = ["carburetor", "fuel-injector", "surefly", "governor"];
 

@@ -45,7 +45,7 @@ const tolerance = Number(opt("--tolerance", "0.5"));
 const phone = flag("--phone");
 const solid = flag("--solid");
 const noLabels = flag("--no-labels");
-if (!args.length) args.push("sr20/overview");
+if (!args.length) args.push("sr22/overview");
 
 /** Airplane ids, and each airplane's system ids in rail order, read from the source. */
 const ids = [

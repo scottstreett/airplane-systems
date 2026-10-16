@@ -26,7 +26,6 @@ it("exports the root, each airplane and every source-defined system without dupl
     expect(VIEW_PATHS).toContain(`/${ac}`);
     for (const sys of VIEW_SYSTEMS[ac]) expect(VIEW_PATHS).toContain(`/${ac}/${sys.id}`);
   }
-  expect(VIEW_PATHS).toContain("/sr20/overview");
-  expect(VIEW_PATHS).toContain("/sr22t/electrical");
+  expect(VIEW_PATHS).toContain("/sr22/overview");
   expect(VIEW_PATHS).not.toContain("/sr22t/bogus");
 });

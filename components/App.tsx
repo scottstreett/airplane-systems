@@ -225,7 +225,7 @@ function viewIn(s: string): [AircraftId, string | undefined] | null {
   } catch {} // malformed escape (e.g. a truncated link): use the raw text
   const [a, b] = s.replace(/^[/#]+/, "").split("/");
   if (isAircraftId(a)) return [a, b];
-  if (a && hasSys(aircraft("sr20"), a)) return ["sr20", a];
+  if (a && hasSys(aircraft("sr22"), a)) return ["sr22", a];
   return null;
 }
 
@@ -265,7 +265,7 @@ function useBoot() {
     const u = fromUrl(),
       saved = read("fleetAc");
     if (u) show(...u);
-    else show(isAircraftId(saved) ? saved : "sr20");
+    else show(isAircraftId(saved) ? saved : "sr22");
     aircraft(useView.getState().ac).prepare?.();
     const preset = parseCameraPreset(new URLSearchParams(location.search).get("cam"));
     if (preset) applyCameraPreset(preset);

@@ -4,7 +4,11 @@
  * See aircraft/reference-traces/README.md for source pages and calibration.
  */
 import { describe, expect, it } from "vitest";
-import { FLEET } from "@/aircraft";
+import { CAT as C172S_CAT } from "@/aircraft/c172s/parts";
+import { CAT as C182T_CAT } from "@/aircraft/c182t/parts";
+import { CAT as DA40_CAT } from "@/aircraft/da40/parts";
+// The deployed FLEET serves the SR22 only (lib/systems.ts); these airplanes' catalogues are imported directly.
+const CATS = { c172s: C172S_CAT, c182t: C182T_CAT, da40: DA40_CAT } as const;
 import traces from "@/aircraft/reference-traces/handbook-traces.json";
 import * as c172 from "@/aircraft/c172s/geometry";
 import * as c182 from "@/aircraft/c182t/geometry";
@@ -26,7 +30,7 @@ for (const { id, wingTip, tailTip } of cases) {
       // DA40's winglet is oblique, so its projected chord is not a constant-z section.
       if (id === "da40" && component === "wing") continue;
       it(`${component} end-cap chord agrees with the handbook trace on both sides`, () => {
-        const cat = FLEET.find((d) => d.id === id)!.labels!.cat;
+        const cat = CATS[id as keyof typeof CATS];
         const shells = cat.shells.filter((s) =>
           component === "wing" ? /wing/i.test(s.name) : /horizontal stabilizer/i.test(s.name),
         );
@@ -73,7 +77,7 @@ it("DA40 horizontal tail retains the AFM §1.4 total area after clipping its lea
 it("C182 maintenance station drawing's dorsal fairing remains visible ahead of FS 185", () => {
   // 182/T182 MM 6-15-00 Fig 1 (PDF 121): the fillet starts near FS 140.
   // A shell that skips the shallow profile breaks used to clip this region off.
-  const cat = FLEET.find((d) => d.id === "c182t")!.labels!.cat;
+  const cat = CATS.c182t;
   const geo = cat.shells.find((s) => s.name === "Vertical stabilizer")!.geo();
   try {
     const p = geo.attributes.position;

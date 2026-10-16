@@ -3,37 +3,37 @@ import { applyCameraPreset, aircraft, FLEET, selectAircraft, sysOf } from "@/air
 import { airplaneBounds, CAMERA_PRESETS, parseCameraPreset, viewPresetCamera } from "@/lib/camera";
 import { useView } from "@/lib/view";
 import { BoxGeometry, Group, Mesh, MeshBasicMaterial, PerspectiveCamera, Vector3 } from "three";
-import { useSR22T } from "@/aircraft/sr22t/store";
+import { useSR22 } from "@/aircraft/sr22/store";
 
 const initialView = useView.getState();
-const initialStore = useSR22T.getState();
+const initialStore = useSR22.getState();
 afterEach(() => {
   useView.setState(initialView);
-  useSR22T.setState(initialStore);
+  useSR22.setState(initialStore);
 });
 describe("URL preset focus selection", () => {
   it("keeps the upstream boot camera when the URL has no cam parameter", () => {
-    selectAircraft("sr22t", "electrical");
+    selectAircraft("sr22", "electrical");
     const requested = useView.getState().cam;
     const preset = parseCameraPreset(new URLSearchParams("").get("cam"));
     if (preset) applyCameraPreset(preset);
     expect(useView.getState().cam).toBe(requested);
-    const [p, t] = sysOf(aircraft("sr22t"), "electrical").cam;
+    const [p, t] = sysOf(aircraft("sr22"), "electrical").cam;
     expect(requested).toMatchObject({ p, t });
     expect(requested?.preset).toBeUndefined();
   });
   it.each(["engine", "overview"] as const)("uses the %s view's camera", (sys) => {
-    useView.setState({ ac: "sr22t", sys });
+    useView.setState({ ac: "sr22", sys });
     applyCameraPreset("top");
-    const [p, t] = sysOf(aircraft("sr22t"), sys).cam;
+    const [p, t] = sysOf(aircraft("sr22"), sys).cam;
     expect(useView.getState().cam).toMatchObject({ p, t, preset: "top" });
   });
   it("retains the airplane's active focus override", () => {
-    useView.setState({ ac: "sr22t", sys: "caps" });
-    useSR22T.getState().update((s) => {
+    useView.setState({ ac: "sr22", sys: "caps" });
+    useSR22.getState().update((s) => {
       s.capsOn = true;
     });
-    const [p, t] = aircraft("sr22t").resetCam!()!;
+    const [p, t] = aircraft("sr22").resetCam!()!;
     applyCameraPreset("side");
     expect(useView.getState().cam).toMatchObject({ p, t, preset: "side" });
   });

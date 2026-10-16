@@ -1,8 +1,11 @@
 import type { Vec3 } from "./math";
 
-/** Every airplane in the fleet. Each one lives in aircraft/<id>/. */
-export const AIRCRAFT_IDS = ["sr20", "sr22", "sr22t", "c172s", "c182t", "da40", "m20c"] as const;
-export type AircraftId = (typeof AIRCRAFT_IDS)[number];
+/** Every airplane modelled in aircraft/<id>/ (the type covers all of them so every folder still type-checks). */
+export const ALL_AIRCRAFT_IDS = ["sr20", "sr22", "sr22t", "c172s", "c182t", "da40", "m20c"] as const;
+export type AircraftId = (typeof ALL_AIRCRAFT_IDS)[number];
+/** The airplanes this deployment serves: N26WM's site shows the SR22 only. Add ids back here (and to FLEET and
+ * FLEET_INDEX) to serve the others; their code is untouched. */
+export const AIRCRAFT_IDS = ["sr22"] as const satisfies readonly AircraftId[];
 export const isAircraftId = (v: unknown): v is AircraftId =>
   typeof v === "string" && (AIRCRAFT_IDS as readonly string[]).includes(v);
 

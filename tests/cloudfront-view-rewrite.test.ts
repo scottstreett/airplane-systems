@@ -19,10 +19,9 @@ const run = (uri: string, querystring: Query = {}) => {
 const paths = VIEW_PATHS.filter((path) => path !== "/");
 
 describe("CloudFront viewer-request view rule", () => {
-  it("covers all 121 aircraft/view paths, including SR20 doors and SR22 engine, and keeps the copied airplane list current", () => {
-    expect(paths).toHaveLength(121);
+  it("covers all 19 SR22 view paths (this deployment serves the SR22 only) and keeps the copied airplane list current", () => {
+    expect(paths).toHaveLength(19);
     expect(paths).toContain("/sr22/engine");
-    expect(paths).toContain("/sr20/doors");
     expect(runInNewContext(source + "\nAIRCRAFT_IDS;")).toEqual(AIRCRAFT_IDS);
   });
 
@@ -52,10 +51,10 @@ describe("CloudFront viewer-request view rule", () => {
   });
 
   it("keeps the existing any-single-system-segment behavior", () => {
-    expect(run("/sr22t/bogus").result.uri).toBe("/index.html");
+    expect(run("/sr22/bogus").result.uri).toBe("/index.html");
   });
 
-  it.each(["/sr22t/", "/sr22t/electrical/"])("redirects %s with encoded and repeated queries intact", (uri) => {
+  it.each(["/sr22/", "/sr22/electrical/"])("redirects %s with encoded and repeated queries intact", (uri) => {
     const { request, result } = run(uri, {
       fiki: { value: "0" },
       "a%20b": { value: "x%2Fy", multiValue: [{ value: "x%2Fy" }, { value: "z+q" }] },
@@ -67,13 +66,13 @@ describe("CloudFront viewer-request view rule", () => {
   });
 
   it("escapes raw query separators and control characters in names and repeated values", () => {
-    const { result } = run("/sr22t/", {
+    const { result } = run("/sr22/", {
       "a&b=\r\n": { value: "x&y=\r\n#% café", multiValue: [{ value: "x&y=\r\n#% café" }, { value: "😀" }] },
       encoded: { value: "x%26y%0D%0A" },
       plus: { value: "+%2B" },
     });
     expect(result.headers.location.value).toBe(
-      "/sr22t?a%26b%3D%0D%0A=x%26y%3D%0D%0A%23%25%20caf%C3%A9&a%26b%3D%0D%0A=%F0%9F%98%80&encoded=x%26y%0D%0A&plus=+%2B",
+      "/sr22?a%26b%3D%0D%0A=x%26y%3D%0D%0A%23%25%20caf%C3%A9&a%26b%3D%0D%0A=%F0%9F%98%80&encoded=x%26y%0D%0A&plus=+%2B",
     );
     expect(result.headers.location.value).not.toMatch(/[\r\n]/);
   });
@@ -88,13 +87,13 @@ describe("CloudFront viewer-request view rule", () => {
     "/",
     "/nope",
     "/electrical",
-    "/sr22t/electrical/extra",
+    "/sr22/electrical/extra",
     "/_next/static/chunks/x.js",
     "/index.txt",
     "/icon.svg",
     "/nope/",
     "/nope/electrical/",
-    "/sr22t//",
+    "/sr22//",
     "/SR22T/electrical",
   ])("passes %s through for DefaultRootObject or origin files/404s", (uri) => {
     const { request, result } = run(uri, { fiki: { value: "0" } });

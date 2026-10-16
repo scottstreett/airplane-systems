@@ -50,7 +50,7 @@ it.each(AIRCRAFT_IDS)(
       rebuilt.dispose();
     }
     // Procedural ownership is explicit for the CAPS draw-range animation as well as replacement cables/struts.
-    if (id === "sr20" || id === "sr22t")
+    if ((id as string) === "sr20" || (id as string) === "sr22t")
       expect(cat.parts.filter((p) => p.name === "Forward harness strap").every((p) => p.dynamicGeo)).toBe(true);
   },
   60_000,
